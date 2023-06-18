@@ -4,11 +4,14 @@ services:
     type: web
     env: node
     startCommand: yarn && start:prod
-
+    rootDir: src
+    autoDeploy: true
+    branch: master
+    buildFilter:
+    paths:
+      - src/**/*.ts
+    ignoredPaths:
+      - src/**/*.test.ts
 
 resources:
-  repositories:
-    - repository: templates
-      type: github
-      autoDeploy: true
-      branch: master
+  
