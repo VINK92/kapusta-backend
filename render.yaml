@@ -1,5 +1,4 @@
 version: 1
-buildCommand: yarn && nest build
 services:
   - name: kapusta-beckend
     type: web
