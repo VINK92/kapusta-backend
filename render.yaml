@@ -5,5 +5,5 @@ services:
     type: web
     env: node
     startCommand: start:prod
-      autoDeploy: true
-      branch: main
+    autoDeploy: true
+    branch: master
