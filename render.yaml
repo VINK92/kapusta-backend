@@ -1,8 +1,8 @@
 version: 1
-buildCommand: yarn ci && yarn run build && nest build
+buildCommand: yarn && nest build
 services:
   - name: kapusta-beckend
-    type: yaml
+    type: web
     env: node
     nodeVersion: 14.20.1
     startCommand: start:prod
