@@ -4,8 +4,6 @@ services:
   - name: kapusta-beckend
     type: web
     env: node
-    nodeVersion: 14.20.1
     startCommand: start:prod
-    github:
       autoDeploy: true
       branch: main
