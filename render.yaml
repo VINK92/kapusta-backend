@@ -7,11 +7,3 @@ services:
     rootDir: src
     autoDeploy: true
     branch: master
-    buildFilter:
-    paths:
-      - src/**/*.ts
-    ignoredPaths:
-      - src/**/*.test.ts
-
-resources:
-  
