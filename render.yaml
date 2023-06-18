@@ -1,5 +1,6 @@
 version: 1
 buildCommand: yarn ci && yarn run build && nest build
+type: yaml
 services:
   - name: kapusta-beckend
     env: node
