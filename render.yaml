@@ -1,0 +1,10 @@
+version: 1
+buildCommand: yarn ci && yarn run build && nest build
+services:
+  - name: kapusta-beckend
+    env: node
+    nodeVersion: 14.20.1
+    startCommand: start:prod
+    github:
+      autoDeploy: true
+      branch: main
