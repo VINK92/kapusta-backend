@@ -3,6 +3,12 @@ services:
   - name: kapusta-beckend
     type: web
     env: node
-    startCommand: start:prod
-    autoDeploy: true
-    branch: master
+    startCommand: yarn && start:prod
+
+
+resources:
+  repositories:
+    - repository: templates
+      type: github
+      autoDeploy: true
+      branch: master
