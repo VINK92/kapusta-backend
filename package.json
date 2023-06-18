@@ -84,5 +84,8 @@
   },
   "_moduleAliases": {
     "src": "./dist"
+  },
+  "engines": {
+    "node": ">=18.10.0"
   }
 }
