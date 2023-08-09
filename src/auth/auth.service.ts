@@ -1,50 +1,63 @@
-import { UsersService } from 'src/users/users.service';
-import { Injectable } from '@nestjs/common';
-import { InjectModel } from '@nestjs/mongoose';
-import { JwtService } from '@nestjs/jwt';
-import { Model } from 'mongoose';
+import { HttpException, Injectable } from '@nestjs/common';
+import { Repository } from 'typeorm';
 import * as bcrypt from 'bcrypt';
+import { JwtService } from '@nestjs/jwt';
 import { CreateUserDto } from 'src/users/dto/createUser.dto';
-import { User, UserDocument } from 'src/users/schemas/user.schema';
-import { threadId } from 'worker_threads';
+import { UserEntity } from 'src/users/user.entity';
+import { LoginUserDto } from 'src/auth/dto/loginUser.dto';
+import { InjectRepository } from '@nestjs/typeorm';
 
 @Injectable()
 export class AuthService {
   constructor(
-    private userService: UsersService,
+    @InjectRepository(UserEntity)
+    private readonly userRepository: Repository<UserEntity>,
     private jwtService: JwtService,
   ) {}
 
-  async registration(userDto: CreateUserDto): Promise<User | Error | null> {
-    const isUniqueEmail = await this.userService.getByEmail(userDto.email);
-    if (isUniqueEmail) {
-      return new Error('Email in use');
-    }
-    const hashedPassword = await bcrypt.hash(userDto.password, 14);
-    const user = await this.userService.create({
-      ...userDto,
-      password: hashedPassword,
+  async registration(
+    userDto: CreateUserDto,
+  ): Promise<UserEntity | Error | null> {
+    const isUniqueEmail = await this.userRepository.findOne({
+      where: { email: userDto.email },
     });
-    return user;
+
+    if (isUniqueEmail) {
+      return new HttpException('Email in use', 422);
+    }
+    const newUser = new UserEntity();
+    Object.assign(newUser, userDto);
+    return await this.userRepository.save(newUser);
   }
 
-  async login(userDto: CreateUserDto): Promise<{ token: string } | Error> {
-    const user = await this.userService.getByEmail(userDto.email);
+  async login(loginDto: LoginUserDto): Promise<{ token: string } | Error> {
+    const user = await this.userRepository.findOne({
+      where: { email: loginDto.email },
+      select: ['id', 'email', 'name', 'password'],
+    });
     if (!user) {
-      return new Error('Authentication is failed');
+      return new HttpException('Authentication is failed', 401);
     }
     const isPasswordValid = this.validatePassword(
-      userDto.password,
+      loginDto.password,
       user.password,
     );
     if (!isPasswordValid) {
-      return new Error('Authentication is failed');
+      return new HttpException('Authentication is failed', 401);
     }
-    const token = this.generateToken(user.id);
+    const token = await this.generateToken(user.id.toString());
 
-    await this.userService.update(user.id, { token });
+    await this.userRepository.update(user.id, token);
 
     return token;
+  }
+
+  async logout(id: number) {
+    await this.userRepository.update(id, { token: '' });
+  }
+
+  async getCurrentUser(id: number): Promise<UserEntity | null> {
+    return await this.userRepository.findOne({ where: { id } });
   }
 
   private async generateToken(id: string): Promise<{ token: string }> {
@@ -55,9 +68,5 @@ export class AuthService {
     userId: string,
   ): Promise<Boolean> {
     return await bcrypt.compare(dtoId, userId);
-  }
-
-  async logout(id: string) {
-    await this.userService.update(id, { token: null });
   }
 }

@@ -1,21 +1,34 @@
 import { config } from 'dotenv';
-import { Module } from '@nestjs/common';
+import { MiddlewareConsumer, Module, RequestMethod } from '@nestjs/common';
 import { MongooseModule } from '@nestjs/mongoose';
 import { AppController } from 'src/app.controller';
 import { AppService } from 'src/app.service';
-import { UsersModule } from 'src/users/users.module';
-import { AuthModule } from './auth/auth.module';
+import { UserModule } from 'src/users/user.module';
+import { AuthModule } from 'src/auth/auth.module';
+import { TypeOrmModule } from '@nestjs/typeorm';
+import ormconfig from './ormconfig';
+import { TransactionModule } from 'src/transactions/transaction.module';
+import { AuthMiddleware } from 'src/middlewares/auth.middleware';
 
 config();
 const uri = process.env.DB_URI as string;
 
 @Module({
   imports: [
-    MongooseModule.forRoot(uri, { useUnifiedTopology: true }),
+    // MongooseModule.forRoot(uri, { useUnifiedTopology: true }),
+    TypeOrmModule.forRoot(ormconfig),
     AuthModule,
-    UsersModule,
+    UserModule,
+    TransactionModule,
   ],
   controllers: [AppController],
   providers: [AppService],
 })
-export class AppModule {}
+export class AppModule {
+  configure(consumer: MiddlewareConsumer) {
+    consumer.apply(AuthMiddleware).forRoutes({
+      path: '*',
+      method: RequestMethod.ALL,
+    });
+  }
+}

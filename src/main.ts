@@ -5,6 +5,7 @@ import { AppModule } from 'src/app.module';
 
 async function startServer() {
   const app = await NestFactory.create(AppModule, {
+    logger: ['error', 'warn'],
     cors: {
       origin: '*',
     },

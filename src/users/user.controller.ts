@@ -6,35 +6,38 @@ import {
   HttpStatus,
   Param,
   Post,
-  Put,
+  Patch,
   UsePipes,
   ValidationPipe,
+  UseGuards,
 } from '@nestjs/common';
-import { User } from 'src/users/schemas/user.schema';
 import { CreateUserDto } from 'src/users/dto/createUser.dto';
-import { UsersService } from 'src/users/users.service';
+import { UserService } from 'src/users/user.service';
 import { UpdateUserDto } from 'src/users/dto/updateUser.dto';
 import {
-  ApiBadGatewayResponse,
   ApiBadRequestResponse,
   ApiOperation,
   ApiResponse,
   ApiTags,
 } from '@nestjs/swagger';
+import { UserEntity } from 'src/users/user.entity';
+import { AuthGuard } from 'src/auth/guards/auth.guard';
+import { BalanceResponseInterface } from 'src/users/types/balance-responce.interface';
+import { User } from 'src/users/decorators/user.decorator';
 
 @ApiTags('Users')
 @Controller('users')
-export class UsersController {
-  constructor(private readonly usersService: UsersService) {}
+export class UserController {
+  constructor(private readonly usersService: UserService) {}
 
   @ApiOperation({ summary: 'Get all users' })
-  @ApiResponse({ status: HttpStatus.OK, type: Array<User> })
+  @ApiResponse({ status: HttpStatus.OK, type: Array<UserEntity> })
   @ApiBadRequestResponse({
     status: HttpStatus.BAD_REQUEST,
     description: 'Bad request',
   })
   @Get()
-  async getAll(): Promise<User[]> {
+  async getAll(): Promise<UserEntity[]> {
     return await this.usersService.getAll();
   }
 
@@ -45,7 +48,7 @@ export class UsersController {
     description: 'Bad request',
   })
   @Get(':id')
-  async getByID(@Param('id') id: string): Promise<User | null> {
+  async getByID(@Param('id') id: number): Promise<UserEntity | null> {
     return await this.usersService.getByID(id);
   }
   @ApiOperation({ summary: 'Create user' })
@@ -57,7 +60,7 @@ export class UsersController {
   @Post('create')
   @UsePipes(new ValidationPipe())
   //   @HttpCode(HttpStatus.CREATED)
-  async create(@Body() body: CreateUserDto): Promise<User | null> {
+  async create(@Body() body: CreateUserDto): Promise<UserEntity | null> {
     return await this.usersService.create(body);
   }
 
@@ -67,11 +70,12 @@ export class UsersController {
     status: HttpStatus.BAD_REQUEST,
     description: 'Bad request',
   })
-  @Put(':id/update')
+  @Patch(':id/update')
+  @UseGuards(AuthGuard)
   async update(
-    @Param('id') id: string,
+    @Param('id') id: number,
     @Body() body: UpdateUserDto,
-  ): Promise<User | null> {
+  ): Promise<UserEntity | null> {
     return await this.usersService.update(id, body);
   }
 
@@ -85,5 +89,14 @@ export class UsersController {
   @UsePipes()
   async delete(@Param('id') id: string): Promise<any> {
     return await this.usersService.delete(id);
+  }
+
+  @Post('user/balance')
+  @UseGuards(AuthGuard)
+  async updateBalance(
+    @User() user: UserEntity,
+    @Body('balance') newBalance: number,
+  ): Promise<BalanceResponseInterface> {
+    return this.usersService.updateBalance(user, newBalance);
   }
 }

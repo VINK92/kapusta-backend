@@ -45,4 +45,4 @@ export class User {
   token: string;
 }
 
-export const UserSchema = SchemaFactory.createForClass(User);
+// export const UserSchema = SchemaFactory.createForClass(User);

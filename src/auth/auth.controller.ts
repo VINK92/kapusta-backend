@@ -1,4 +1,13 @@
-import { Controller, HttpStatus, Param, Post } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  HttpStatus,
+  Param,
+  Post,
+  Req,
+  UseGuards,
+} from '@nestjs/common';
 import {
   ApiBadRequestResponse,
   ApiForbiddenResponse,
@@ -9,9 +18,12 @@ import {
 } from '@nestjs/swagger';
 import { string } from 'joi';
 import { AuthService } from 'src/auth/auth.service';
+import { LoginUserDto } from 'src/auth/dto/loginUser.dto';
+import { AuthGuard } from 'src/auth/guards/auth.guard';
 import { TokenType } from 'src/auth/types';
+import { User } from 'src/users/decorators/user.decorator';
 import { CreateUserDto } from 'src/users/dto/createUser.dto';
-import { User } from 'src/users/schemas/user.schema';
+import { UserEntity } from 'src/users/user.entity';
 
 @ApiTags('Authentication')
 @Controller('auth')
@@ -19,7 +31,7 @@ export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
   @ApiOperation({ summary: 'Register user' })
-  @ApiResponse({ status: 200, type: User })
+  @ApiResponse({ status: 200, type: UserEntity })
   @ApiBadRequestResponse({
     status: HttpStatus.BAD_REQUEST,
     description: 'Bad request',
@@ -33,7 +45,10 @@ export class AuthController {
     description: 'Forbidden',
   })
   @Post('registration')
-  async registration(userDto: CreateUserDto): Promise<User | Error | null> {
+  async registration(
+    @Body()
+    userDto: CreateUserDto,
+  ): Promise<UserEntity | Error | null> {
     return await this.authService.registration(userDto);
   }
 
@@ -44,8 +59,8 @@ export class AuthController {
     description: 'Bad request',
   })
   @Post('login')
-  async login(userDto: CreateUserDto): Promise<TokenType | Error> {
-    return await this.authService.login(userDto);
+  async login(@Body() loginDto: LoginUserDto): Promise<TokenType | Error> {
+    return await this.authService.login(loginDto);
   }
 
   @ApiOperation({ summary: 'Logout user' })
@@ -55,7 +70,13 @@ export class AuthController {
     description: 'Bad request',
   })
   @Post('/:id/logout')
-  async logout(@Param('id') id: string) {
+  async logout(@Param('id') id: number) {
     return await this.authService.logout(id);
+  }
+
+  @Get('current')
+  @UseGuards(AuthGuard)
+  async getCurrentUser(@User('id') id: number): Promise<UserEntity | null> {
+    return await this.authService.getCurrentUser(id);
   }
 }

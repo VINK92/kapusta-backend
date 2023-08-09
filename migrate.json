@@ -1,4 +1,4 @@
 {
-  "dbConnectionUri": "mongodb+srv://nazarukV:q1w2e3r4@node-testing.xt4mc.mongodb.net/db-kapusta?retryWrites=true&w=majority",
-  "migrationsDir": "db/migrations"
+  "dbConnectionUri": "mongodb+srv://nazarukV:q1w2e3r4@node-testing.xt4mc.mongodb.net/db-kapusta/users?retryWrites=true&w=majority",
+  "migrationsDir": "db/users"
 }

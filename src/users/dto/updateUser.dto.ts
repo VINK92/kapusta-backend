@@ -1,3 +1,4 @@
-import { CreateUserDto } from 'src/users/dto/createUser.dto';
-
-export class UpdateUserDto implements Partial<CreateUserDto> {}
+export class UpdateUserDto {
+  readonly name: string;
+  readonly email: string;
+}

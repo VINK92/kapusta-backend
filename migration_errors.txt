@@ -1,0 +1,9 @@
+yarn run v1.22.15
+$ yarn typeorm migration:run
+$ ts-node -r tsconfig-paths/register ./node_modules/typeorm/cli.js -d src/ormdatasource.ts migration:run
+query: SELECT * FROM current_schema()
+query: SELECT version();
+query: SELECT * FROM "information_schema"."tables" WHERE "table_schema" = 'public' AND "table_name" = 'migrations'
+query: SELECT * FROM "migrations" "migrations" ORDER BY "id" DESC
+No migrations are pending
+Done in 6.55s.
