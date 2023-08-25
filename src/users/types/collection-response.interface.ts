@@ -1,6 +1,6 @@
 export interface CollectionResponse<T> {
   meta?: {
-    pageCount: number;
+    page: number;
     resourceCount: number;
   };
   data: T[];

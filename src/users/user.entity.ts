@@ -30,6 +30,9 @@ export class UserEntity {
   @Column({ default: 0 })
   balance: number;
 
+  @Column({ default: false })
+  isBalanceInitiated: boolean;
+
   @BeforeInsert()
   async hashPassword() {
     this.password = await hash(this.password, 16);

@@ -14,6 +14,7 @@ import { CreateTransactionDto } from 'src/transactions/dto/createTransaction.dto
 import { TransactionEntity } from 'src/transactions/transaction.entity';
 import { TransactionService } from 'src/transactions/transaction.service';
 import { TransactionResponse } from 'src/transactions/types/transaction-response.interface';
+import { TransactionsQuery } from 'src/transactions/types/transactions-query.interface';
 import { User } from 'src/users/decorators/user.decorator';
 import { CollectionResponse } from 'src/users/types/collection-response.interface';
 import { UserEntity } from 'src/users/user.entity';
@@ -38,7 +39,7 @@ export class TransactionController {
   @UseGuards(AuthGuard)
   async getAllTransaction(
     @User() user: UserEntity,
-    @Query() query: any,
+    @Query() query: any, // TransactionsQuery,
   ): Promise<CollectionResponse<TransactionEntity>> {
     return await this.transactionService.getAllTransaction(user, query);
   }

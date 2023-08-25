@@ -97,6 +97,6 @@ export class UserController {
     @User() user: UserEntity,
     @Body('balance') newBalance: number,
   ): Promise<BalanceResponseInterface> {
-    return this.usersService.updateBalance(user, newBalance);
+    return this.usersService.initiateBalance(user, newBalance);
   }
 }

@@ -49,22 +49,15 @@ export class UserService {
     return await this.userRepository.findOne({ where: { email } });
   }
 
-  async updateBalance(
+  async initiateBalance(
     user: UserEntity,
     newBalance: number,
   ): Promise<BalanceResponseInterface> {
-    user.balance = newBalance;
+    if (user.isBalanceInitiated === false) {
+      user.balance = newBalance;
+      user.isBalanceInitiated = true;
+    }
     await this.userRepository.save(user);
-    return { balance: newBalance };
-  }
-
-  buildCollectionResponse<T>(items: Array<T>): CollectionResponse<T> {
-    return {
-      data: items,
-      meta: {
-        pageCount: items.length / 10,
-        resourceCount: items.length,
-      },
-    };
+    return { balance: newBalance, isBalanceInitiated: user.isBalanceInitiated };
   }
 }

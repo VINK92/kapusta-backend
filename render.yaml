@@ -7,3 +7,8 @@ services:
     rootDir: src
     autoDeploy: true
     branch: master
+  #   plan: free
+  # databases:
+  # - name: elephant
+  #   region: frankfurt
+  #   plan: free

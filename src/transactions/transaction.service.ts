@@ -4,6 +4,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { CreateTransactionDto } from 'src/transactions/dto/createTransaction.dto';
 import { TransactionEntity } from 'src/transactions/transaction.entity';
 import { TransactionResponse } from 'src/transactions/types/transaction-response.interface';
+import { TransactionsQuery } from 'src/transactions/types/transactions-query.interface';
 import { CollectionResponse } from 'src/users/types/collection-response.interface';
 import { UserEntity } from 'src/users/user.entity';
 import { buildCollectionResponse } from 'src/utils/build-collection-response';
@@ -32,26 +33,27 @@ export class TransactionService {
 
   async getAllTransaction(
     user: UserEntity,
-    query: any,
+    query: TransactionsQuery,
   ): Promise<CollectionResponse<TransactionEntity>> {
-    const { limit, offset } = query;
+    const { page, pageSize } = query;
     const queryBuilder = this.dataSource
       .getRepository(TransactionEntity)
       .createQueryBuilder('transactions')
       .where('transactions.user.id = :id', { id: user.id })
       .leftJoinAndSelect('transactions.user', 'user')
-      .orderBy('transactions.createdAt', 'DESC')
-      .take(limit)
-      .skip(offset);
-    //   .skip(skip);
+      .orderBy('transactions.createdAt', 'DESC');
+
+    if (page && pageSize) {
+      queryBuilder.take(pageSize).skip(page * pageSize - pageSize);
+    }
 
     const transactionsData = await queryBuilder.getManyAndCount();
     const itemsCount = await queryBuilder.getCount();
-    // const pageCount = await queryBuilder.;
 
     return buildCollectionResponse<TransactionResponse>(
       transactionsData[0],
       itemsCount,
+      page,
     );
 
     // return await this.transactionRepository.find({
