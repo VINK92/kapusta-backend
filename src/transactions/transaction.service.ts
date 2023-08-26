@@ -35,7 +35,7 @@ export class TransactionService {
     user: UserEntity,
     query: TransactionsQuery,
   ): Promise<CollectionResponse<TransactionEntity>> {
-    const { page, pageSize } = query;
+    const { page, pageSize, transactionType, category } = query;
     const queryBuilder = this.dataSource
       .getRepository(TransactionEntity)
       .createQueryBuilder('transactions')
@@ -45,6 +45,17 @@ export class TransactionService {
 
     if (page && pageSize) {
       queryBuilder.take(pageSize).skip(page * pageSize - pageSize);
+    }
+
+    if (transactionType) {
+      queryBuilder.where('transactions.type = :type', {
+        type: transactionType,
+      });
+    }
+    if (category) {
+      queryBuilder.where('transactions.category = :category', {
+        category,
+      });
     }
 
     const transactionsData = await queryBuilder.getManyAndCount();

@@ -39,7 +39,7 @@ export class TransactionController {
   @UseGuards(AuthGuard)
   async getAllTransaction(
     @User() user: UserEntity,
-    @Query() query: any, // TransactionsQuery,
+    @Query() query: TransactionsQuery, // TransactionsQuery,
   ): Promise<CollectionResponse<TransactionEntity>> {
     return await this.transactionService.getAllTransaction(user, query);
   }

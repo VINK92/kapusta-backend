@@ -8,7 +8,19 @@ import {
 } from 'typeorm';
 
 export enum TransactionCategory {
+  transport = 'transport',
   products = 'products',
+  health = 'health',
+  alcohol = 'alcohol',
+  entertainment = 'entertainment',
+  housing = 'housing',
+  technique = 'technique',
+  communal = 'communal',
+  sports = 'sports',
+  education = 'education',
+  other = 'other',
+  salary = 'salary',
+  addIncome = 'addIncome'
 }
 
 export enum TransactionType {
