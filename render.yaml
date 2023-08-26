@@ -8,7 +8,12 @@ services:
     autoDeploy: true
     branch: master
     plan: free
-  databases:
-  - name: elephant
-    region: frankfurt
+    envVars:
+      - key: DATABASE_URL
+        fromDatabase:
+          name: kapusta-psql
+          property: connectionString
+
+databases:
+  - name: kapusta-psql
     plan: free

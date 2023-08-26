@@ -1,6 +1,6 @@
 import { config } from 'dotenv';
 import { MiddlewareConsumer, Module, RequestMethod } from '@nestjs/common';
-import { MongooseModule } from '@nestjs/mongoose';
+// import { MongooseModule } from '@nestjs/mongoose';
 import { AppController } from 'src/app.controller';
 import { AppService } from 'src/app.service';
 import { UserModule } from 'src/users/user.module';
@@ -11,7 +11,7 @@ import { TransactionModule } from 'src/transactions/transaction.module';
 import { AuthMiddleware } from 'src/middlewares/auth.middleware';
 
 config();
-const uri = process.env.DB_URI as string;
+// const uri = process.env.DB_URI as string;
 
 @Module({
   imports: [

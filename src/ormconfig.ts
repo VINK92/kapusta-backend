@@ -13,13 +13,16 @@ import { PostgresConnectionOptions } from 'typeorm/driver/postgres/PostgresConne
 // };
 
 // export default config;
+
+// const port = process.env.PORT as number;
+
 const config: PostgresConnectionOptions = {
   type: 'postgres',
-  host: 'postgres://kapustapsqluser:FrDOffMVTjZm19EFtMA602eALq70z7mR@dpg-cjjp5f8cfp5c738ikr70-a/kapustapsqldb',
+  host: process.env.DB_URI,
   port: 5432,
-  username: 'kapustapsqldb',
-  password: 'FrDOffMVTjZm19EFtMA602eALq70z7mR',
-  database: 'kapustapsqldb',
+  username: process.env.USER_NAME,
+  password: process.env.USER_PASSWORD,
+  database: process.env.DB_NAME,
   synchronize: false,
   entities: [__dirname + '/**/*.entity{.ts,.js}'],
   migrations: [__dirname + '/migrations/**/*{.ts,.js}'],
