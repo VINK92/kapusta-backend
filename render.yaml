@@ -9,7 +9,27 @@ services:
     branch: master
     plan: free
     envVars:
-      - key: DATABASE_URL
+      - key: HOST
+        fromDatabase:
+          name: kapusta-psql
+          property: host
+      - key: PORT
+        fromDatabase:
+          name: kapusta-psql
+          property: port
+      - key: DB_NAME
+        fromDatabase:
+          name: kapusta-psql
+          property: database
+      - key: USER_NAME
+        fromDatabase:
+          name: kapusta-psql
+          property: user
+      - key: USER_PASSWORD
+        fromDatabase:
+          name: kapusta-psql
+          property: password
+      - key: DB_URL
         fromDatabase:
           name: kapusta-psql
           property: connectionString
