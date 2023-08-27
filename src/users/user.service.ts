@@ -56,8 +56,28 @@ export class UserService {
     if (user.isBalanceInitiated === false) {
       user.balance = newBalance;
       user.isBalanceInitiated = true;
+      await this.userRepository.save(user);
+      return {
+        balance: newBalance,
+        isBalanceInitiated: user.isBalanceInitiated,
+      };
     }
-    await this.userRepository.save(user);
-    return { balance: newBalance, isBalanceInitiated: user.isBalanceInitiated };
+    return {
+      balance: user.balance,
+      isBalanceInitiated: user.isBalanceInitiated,
+    };
+  }
+
+  async getUserBalance(
+    user: UserEntity,
+  ): Promise<BalanceResponseInterface | null> {
+    const u = await this.userRepository.findOneBy({ id: user.id });
+    if (u) {
+      return {
+        balance: u.balance,
+        isBalanceInitiated: u.isBalanceInitiated,
+      };
+    }
+    return null;
   }
 }

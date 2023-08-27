@@ -2,7 +2,10 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 // import ormdatasource from 'src/ormdatasource';
 import { CreateTransactionDto } from 'src/transactions/dto/createTransaction.dto';
-import { TransactionEntity } from 'src/transactions/transaction.entity';
+import {
+  TransactionEntity,
+  TransactionType,
+} from 'src/transactions/transaction.entity';
 import { TransactionResponse } from 'src/transactions/types/transaction-response.interface';
 import { TransactionsQuery } from 'src/transactions/types/transactions-query.interface';
 import { CollectionResponse } from 'src/users/types/collection-response.interface';
@@ -15,6 +18,8 @@ export class TransactionService {
   constructor(
     @InjectRepository(TransactionEntity)
     private readonly transactionRepository: Repository<TransactionEntity>,
+    @InjectRepository(UserEntity)
+    private readonly userRepository: Repository<UserEntity>,
     private dataSource: DataSource,
   ) {}
   async createTransaction(
@@ -23,11 +28,22 @@ export class TransactionService {
   ): Promise<TransactionResponse> {
     const transaction = new TransactionEntity();
     Object.assign(transaction, createTransactionDto);
+
     if (!transaction.type) {
       transaction.type = '';
     }
-    transaction.user = user;
 
+    if (transaction.type === TransactionType.deposit) {
+      user.balance = Number(user.balance) + Number(transaction.sum);
+      await this.userRepository.save(user);
+    }
+
+    if (transaction.type === TransactionType.withdrawal) {
+      user.balance = user.balance - transaction.sum;
+      await this.userRepository.save(user);
+    }
+
+    transaction.user = user;
     return await this.transactionRepository.save(transaction);
   }
 
@@ -35,7 +51,7 @@ export class TransactionService {
     user: UserEntity,
     query: TransactionsQuery,
   ): Promise<CollectionResponse<TransactionEntity>> {
-    const { page, pageSize, transactionType, category } = query;
+    const { page, pageSize, transactionType, category, month, year } = query;
     const queryBuilder = this.dataSource
       .getRepository(TransactionEntity)
       .createQueryBuilder('transactions')
@@ -56,6 +72,14 @@ export class TransactionService {
       queryBuilder.where('transactions.category = :category', {
         category,
       });
+    }
+
+    if (month && year) {
+      queryBuilder
+        .where(`EXTRACT(YEAR FROM transactions.createdAt) = :year`, { year })
+        .andWhere(`EXTRACT(MONTH FROM transactions.createdAt) = :month`, {
+          month,
+        });
     }
 
     const transactionsData = await queryBuilder.getManyAndCount();
