@@ -1,5 +1,6 @@
 import { config } from 'dotenv';
 import { MiddlewareConsumer, Module, RequestMethod } from '@nestjs/common';
+import { ConfigModule } from '@nestjs/config';
 // import { MongooseModule } from '@nestjs/mongoose';
 import { AppController } from 'src/app.controller';
 import { AppService } from 'src/app.service';
@@ -16,6 +17,9 @@ config();
 @Module({
   imports: [
     // MongooseModule.forRoot(uri, { useUnifiedTopology: true }),
+    ConfigModule.forRoot({
+      envFilePath: `.env.${process.env.NODE_ENV}`,
+    }),
     TypeOrmModule.forRoot(ormconfig),
     AuthModule,
     UserModule,

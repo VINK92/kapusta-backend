@@ -15,7 +15,7 @@ export class AuthMiddleware implements NestMiddleware {
 
   async use(req: IExpressRequest, res: Response, next: NextFunction) {
     if (!req.headers.authorization) {
-      req.user = null;
+      req.user = undefined;
       next();
       return;
     }
@@ -33,7 +33,7 @@ export class AuthMiddleware implements NestMiddleware {
       req.user = user;
       next();
     } catch (err) {
-      req.user = null;
+      req.user = undefined;
       next();
       return;
     }
